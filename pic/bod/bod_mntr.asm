@@ -1,8 +1,8 @@
+; $Id$
+
 ;**********************************************************************
 ;                                                                     *
-;    Filename:	    bod_mntr.asm                                      *
-;    Date:          04 Apr 2001                                       *
-;    File Version:  5                                                 *
+;    Description:                                                     *
 ;                                                                     *
 ;    Author:        Chris White (whitecf@bcs.org.uk)                  *
 ;    Company:       Monitor Computing Services Ltd.                   *
@@ -60,8 +60,8 @@
 ; Include and configuration directives                                *
 ;**********************************************************************
 
-#include <\dev\projects\picsrl\asyn_srl.inc>
-#include <\dev\projects\bodnet\pic\bodlink\bod_link.inc>
+#include <\dev\projects\utility\pic\asyn_srl.inc>
+#include <\dev\projects\utility\pic\link.inc>
 
 
 ;**********************************************************************
@@ -252,7 +252,7 @@ LinkHTx		LinkTx lnkDSte, SerDTx
 
 #define NOMONBANNER
 #define MONUSERON
-#include <\dev\projects\monitor\pic\pic_mntr.inc>
+#include <\dev\projects\utility\pic\monitor.inc>
 
 
 ;**********************************************************************

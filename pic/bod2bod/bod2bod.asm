@@ -1,8 +1,8 @@
+; $Id$
+
 ;**********************************************************************
 ;                                                                     *
-;    Filename:	    bod2bod.asm                                       *
-;    Date:          8 March 1999                                      *
-;    File Version:  1                                                 *
+;    Description:                                                     *
 ;                                                                     *
 ;    Author:        Chris White (whitecf@bcs.org.uk)                  *
 ;    Company:       Monitor Computing Services Ltd.                   *
@@ -41,21 +41,25 @@
 ;**********************************************************************
 
 
-;**********************************************************************
-; Include and configuration directives                                *
-;**********************************************************************
+	list      p=16F84
 
-	list      p=16C84
-	#include <p16C84.inc>
+#include <p16F84.inc>
+
 #define SYNC_SERIAL
-	#include <\dev\projects\picsrl\asyn_srl.inc>
-	#include <\dev\projects\bodnet\pic\bodlink\bod_link.inc>
 
 	__CONFIG   _CP_OFF & _WDT_OFF & _PWRTE_ON & _XT_OSC
 
 ; '__CONFIG' directive is used to embed configuration data within .asm file.
 ; The lables following the directive are located in the respective .inc file.
 ; See respective data sheet for additional information on configuration word.
+
+
+;**********************************************************************
+; Include and configuration directives                                *
+;**********************************************************************
+
+#include <\dev\projects\utility\pic\asyn_srl.inc>
+#include <\dev\projects\utility\pic\link.inc>
 
 
 ;**********************************************************************

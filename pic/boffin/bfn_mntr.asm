@@ -1,8 +1,8 @@
+; $Id$
+
 ;**********************************************************************
 ;                                                                     *
-;    Filename:	    bfn_mntr.asm                                      *
-;    Date:          04 Apr 2001                                       *
-;    File Version:  6                                                 *
+;    Description:                                                     *
 ;                                                                     *
 ;    Author:        Chris White (whitecf@bcs.org.uk)                  *
 ;    Company:       Monitor Computing Services Ltd.                   *
@@ -44,9 +44,9 @@
 ;**********************************************************************
 
 
-	list      p=16C84
+	list      p=16F84
 
-#include <p16C84.inc>
+#include <p16F84.inc>
 
 	__CONFIG   _CP_OFF & _WDT_OFF & _PWRTE_ON & _XT_OSC
 
@@ -59,8 +59,8 @@
 ; Include and configuration directives                                *
 ;**********************************************************************
 
-#include <\dev\projects\picsrl\asyn_srl.inc>
-#include <\dev\projects\bodnet\pic\bodlink\bod_link.inc>
+#include <\dev\projects\utility\pic\asyn_srl.inc>
+#include <\dev\projects\utility\pic\link.inc>
 
 
 ;**********************************************************************
@@ -245,7 +245,7 @@ LinkHTx		LinkTx lnkDSte, SerDTx
 ;**********************************************************************
 
 #define MONUSERON
-#include <\dev\projects\picmntr\pic\pic_mntr.inc>
+#include <\dev\projects\utility\pic\monitor.inc>
 
 
 ;**********************************************************************

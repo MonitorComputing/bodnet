@@ -19,7 +19,7 @@ BuildRequired=0
 [BOD2BOD.ASM]
 Type=4
 Path=
-FileList=P16C84.INC;ASYN_SRL.INC;BOD_LINK.INC;
+FileList=P16F84.INC;ASYN_SRL.INC;LINK.INC;
 BuildTool=
 OptionString=
 AdditionalOptionString=
@@ -72,7 +72,7 @@ AdditionalOptionString=
 
 [ASYN_SRL.INC]
 Type=5
-Path=/home/chris/DEV\PROJECTS\PICSRL\
+Path=/home/chris/DEV\PROJECTS\UTILITY\PIC\
 FileList=
 BuildTool=
 OptionString=
@@ -120,6 +120,22 @@ AdditionalOptionString=
 [mru-list]
 1=d:\dev\projects\bodnet\pic\bod2bod\bod2bod.asm
 
+[P16F84.INC]
+Type=5
+Path=
+FileList=
+BuildTool=
+OptionString=
+AdditionalOptionString=
+
+[LINK.INC]
+Type=5
+Path=/home/chris/DEV\PROJECTS\UTILITY\PIC\
+FileList=
+BuildTool=
+OptionString=
+AdditionalOptionString=
+
 [Windows]
-0=0004 154 154 958 613 9 0
+0=0000  154 154 958 613 3 0
 
