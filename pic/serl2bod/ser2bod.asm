@@ -49,9 +49,9 @@
 ;**********************************************************************
 
 	list      p=16C84
-	#include <c:\mplab\inc\p16C84.inc>
-	#include <\dev\projects\picsrl\asyn_srl.inc>
-	#include <\dev\projects\bodnet\pic\bodlink\bod_link.inc>
+#include <p16C84.inc>
+#include <\dev\projects\picsrl\asyn_srl.inc>
+#include <\dev\projects\bodnet\pic\bodlink\bod_link.inc>
 
 	__CONFIG   _CP_OFF & _WDT_OFF & _PWRTE_ON & _XT_OSC
 
@@ -149,7 +149,7 @@ clkBit        EQU     1           ; 'Down' side clock output on Port A bit 1
 ;**********************************************************************
 
 		ORG     0x000             ; processor reset vector
-  		goto    Main              ; Jump to beginning of program
+BootVector	goto    Main              ; Jump to beginning of program
 
 
 ;**********************************************************************

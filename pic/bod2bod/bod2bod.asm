@@ -46,10 +46,10 @@
 ;**********************************************************************
 
 	list      p=16C84
-	#include <c:\mplab\inc\p16C84.inc>
+	#include <p16C84.inc>
 #define SYNC_SERIAL
-	#include <\DEV\PROJECTS\PICSRL\asyn_srl.inc>
-	#include <\DEV\PROJECTS\BODNET\PIC\BODLINK\bod_link.inc>
+	#include <\dev\projects\picsrl\asyn_srl.inc>
+	#include <\dev\projects\bodnet\pic\bodlink\bod_link.inc>
 
 	__CONFIG   _CP_OFF & _WDT_OFF & _PWRTE_ON & _XT_OSC
 

@@ -19,7 +19,7 @@ BuildRequired=0
 [BOD_MNTR.ASM]
 Type=4
 Path=
-FileList=P16C84.INC;ASYN_SRL.INC;BOD_LINK.INC;BOD_MNTR.INC;
+FileList=P16C84.INC;ASYN_SRL.INC;BOD_LINK.INC;PIC_MNTR.INC;
 BuildTool=
 OptionString=
 AdditionalOptionString=
@@ -49,10 +49,14 @@ ProgBankRegEnable=0
 BankRegStartAddress=0
 BankRegEndAddress=0
 DisableIoPins=0
+12CXXX_MCLR_ENABLE=0
+CPP2_ENABLE=0
+LPSC_ENABLE=0
+MCLRPU_ENABLE=0
 
 [P16C84.INC]
 Type=5
-Path=C:\MPLAB\INC\
+Path=
 FileList=
 BuildTool=
 OptionString=
@@ -60,7 +64,7 @@ AdditionalOptionString=
 
 [ASYN_SRL.INC]
 Type=5
-Path=\DEV\PROJECTS\PICSRL\
+Path=/home/chris/DEV\PROJECTS\PICSRL\
 FileList=
 BuildTool=
 OptionString=
@@ -94,10 +98,12 @@ TimeStampWidth=11.000000
 TimeStampCycles=1
 TraceLines=100
 TraceFull=0
+TimeStampDiplay=0
+CodeCoverageReset=1
 
 [BOD_LINK.INC]
 Type=5
-Path=\DEV\PROJECTS\BODNET\PIC\BODLINK\
+Path=/home/chris/DEV\PROJECTS\BODNET\PIC\BODLINK\
 FileList=
 BuildTool=
 OptionString=
@@ -105,12 +111,15 @@ AdditionalOptionString=
 
 [PIC_MNTR.INC]
 Type=5
-Path=\DEV\PROJECTS\PICMNTR\pic_mntr.asm
+Path=/home/chris/DEV\PROJECTS\PICMNTR\PIC\
 FileList=
 BuildTool=
 OptionString=
 AdditionalOptionString=
 
-[Windows]
-
 [mru-list]
+1=\dev\projects\picmntr\pic\pic_mntr.inc
+2=d:\dev\projects\bodnet\pic\bod\bod_mntr.asm
+
+[Windows]
+0=0000  0 0 406 176 3 0

@@ -19,7 +19,7 @@ BuildRequired=0
 [SER2BOD.ASM]
 Type=4
 Path=
-FileList=P16C84.INC;SERIAL.INC;BOD_LINK.INC;
+FileList=P16C84.INC;ASYN_SRL.INC;BOD_LINK.INC;
 BuildTool=
 OptionString=
 AdditionalOptionString=
@@ -56,10 +56,15 @@ OSC_Settings=0
 ProgBankRegEnable=0
 BankRegStartAddress=0
 BankRegEndAddress=0
+DisableIoPins=0
+12CXXX_MCLR_ENABLE=0
+CPP2_ENABLE=0
+LPSC_ENABLE=0
+MCLRPU_ENABLE=0
 
 [P16C84.INC]
 Type=5
-Path=C:\MPLAB\INC\
+Path=
 FileList=
 BuildTool=
 OptionString=
@@ -67,7 +72,7 @@ AdditionalOptionString=
 
 [ASYN_SRL.INC]
 Type=5
-Path=\DEV\PROJECTS\PICSRL\
+Path=/home/chris/DEV\PROJECTS\PICSRL\
 FileList=
 BuildTool=
 OptionString=
@@ -101,20 +106,20 @@ TimeStampWidth=11.000000
 TimeStampCycles=1
 TraceLines=100
 TraceFull=0
+TimeStampDiplay=0
+CodeCoverageReset=1
 
 
 [BOD_LINK.INC]
 Type=5
-Path=\DEV\PROJECTS\BODNET\PIC\BODLINK\
+Path=/home/chris/DEV\PROJECTS\BODNET\PIC\BODLINK\
 FileList=
 BuildTool=
 OptionString=
 AdditionalOptionString=
 
 [Windows]
-2=0000 \DEV\PROJECTS\PICSRL\ASYN_SRL.inc 198 198 994 646 9 0
-1=0000 \DEV\PROJECTS\BODNET\PIC\BODLINK\bod_link.inc 44 44 840 492 9 0
-0=0000 \DEV\PROJECTS\BODNET\PIC\SERL2BOD\ser2bod.asm 215 2 994 665 9 0
+0=0004 88 88 892 547 9 0
 
 [mru-list]
 1=\DEV\PROJECTS\PICSRL\ASYN_SRL.inc
