@@ -22,10 +22,10 @@ dir_lib=
 dir_lkr=
 
 [FILE_INFO]
-file_000=/home/chris/Dev\projects\bodnet\pic\bod\BOD_MNTR.ASM
-file_001=/home/chris/DEV\PROJECTS\UTILITY\PIC\ASYN_SRL.INC
-file_002=/home/chris/DEV\PROJECTS\UTILITY\PIC\LINK.INC
-file_003=/home/chris/DEV\PROJECTS\UTILITY\PIC\MONITOR.INC
+file_000=./bod_mntr.asm
+file_001=../utility/asyn_srl.inc
+file_002=../utility/link.inc
+file_003=../utility/monitor.inc
 
 [TOOL_SETTINGS]
 TS{DD2213A8-6310-47b1-8376-9430CDFC013F}=/e+ /l+ /x- /w0 /c+ /m+ /rdec
