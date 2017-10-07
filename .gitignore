@@ -2,8 +2,9 @@
 *.lst
 *.ERR
 *.LST
+**/build/
 **/default/
+**/dist/
 **/nbproject/private/
 **/nbproject/Makefile*
 **/nbproject/Package*
-/pic/bod/build/default/
