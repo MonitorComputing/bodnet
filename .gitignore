@@ -1,6 +1,8 @@
-/pic/bod/nbproject/private/
-/pic/bod/build/default/
-/pic/bod2bod/nbproject/private/
-/pic/boffin/nbproject/private/
-/pic/boffin/build/default/
-/pic/boffin/dist/default/
+*.err
+*.lst
+*.ERR
+*.LST
+**/default/
+**/nbproject/private/
+**/nbproject/Makefile*
+**/nbproject/Package*

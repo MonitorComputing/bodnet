@@ -42,9 +42,9 @@
 ;**********************************************************************
 
 
-	list      p=16F84
+	list      p=16f84
 
-#include <p16F84.inc>
+#include <p16f84.inc>
 
 	__CONFIG   _CP_OFF & _WDT_OFF & _PWRTE_ON & _XT_OSC
 
@@ -57,8 +57,8 @@
 ; Include and configuration directives                                *
 ;**********************************************************************
 
-#include <\dev\projects\utility\pic\asyn_srl.inc>
-#include <\dev\projects\utility\pic\link.inc>
+#include "../utility/asyn_srl.inc"
+#include "../utility/link_hd.inc"
 
 
 ;**********************************************************************
@@ -191,12 +191,6 @@ EndISR		bsf     clkPORT,clkBit    ; Set BodNet clock output low
 ; Physical layer service routine macro invocations                    *
 ;**********************************************************************
 
-SrvcULink	SrvcLink   PerformRxU, PerformTxU, lnkUSte, intSerIni, serUTmr, EnableTxU, InitTxU, EnableRxU, InitRxU
-
-
-SrvcDLink	SrvcLink   PerformRxD, PerformTxD, lnkDSte, intSerIni, serDTmr, EnableTxD, InitTxD, EnableRxD, InitRxD
-
-
 EnableRxU	EnableRx  rxUTRIS, rxUPORT, rxUBit
 		return
 
@@ -217,6 +211,9 @@ InitTxU		InitTx  serUTmr, serStatus, serURdy, txUBsy
 
 
 PerformTxU	PerformTx serUTmr, serStatus, serUByt, serUReg, serURdy, txUBsy, txDataBits, serUBitCnt, intSerBit, txUPORT, txUBit
+
+
+SrvcULink	SrvcLink   PerformRxU, PerformTxU, lnkUSte, intSerIni, serUTmr, EnableTxU, InitTxU, EnableRxU, InitRxU
 
 
 ; 'Down' link is synchronous so use #define to simplify compiled code
@@ -242,6 +239,9 @@ InitTxD		InitTx  serDTmr, serStatus, serDRdy, txDBsy
 
 PerformTxD	PerformTx serDTmr, serStatus, serDByt, serDReg, serDRdy, txDBsy, txDataBits, serDBitCnt, 1, txDPORT, txDBit
 #undefine SYNC_SERIAL
+
+
+SrvcDLink	SrvcLink   PerformRxD, PerformTxD, lnkDSte, intSerIni, serDTmr, EnableTxD, InitTxD, EnableRxD, InitRxD
 
 
 ;**********************************************************************

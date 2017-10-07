@@ -62,7 +62,7 @@
       </makeCustomizationType>
       <MPASMWIN-AS>
         <property key="cross.reference.file" value=""/>
-        <property key="default.radix" value="HEX"/>
+        <property key="default.radix" value="DEC"/>
         <property key="enable.case.sensitivity" value="true"/>
         <property key="hex.output.format" value="INHX32"/>
         <property key="preprocessor.macros" value=""/>
