@@ -42,9 +42,9 @@
 ;**********************************************************************
 
 
-	list      p=16F84
+	list      p=16f84
 
-#include <p16F84.inc>
+#include <p16f84.inc>
 
 	__CONFIG   _CP_OFF & _WDT_OFF & _PWRTE_ON & _XT_OSC
 
@@ -57,8 +57,8 @@
 ; Include and configuration directives                                *
 ;**********************************************************************
 
-#include <\dev\projects\utility\pic\asyn_srl.inc>
-#include <\dev\projects\utility\pic\link.inc>
+#include "../utility/asyn_srl.inc"
+#include "../utility/link_hd.inc"
 
 
 ;**********************************************************************
@@ -243,7 +243,7 @@ LinkHTx		LinkTx lnkDSte, SerDTx
 ;**********************************************************************
 
 #define MONUSERON
-#include <\dev\projects\utility\pic\monitor.inc>
+#include "../utility/monitor.inc"
 
 
 ;**********************************************************************
