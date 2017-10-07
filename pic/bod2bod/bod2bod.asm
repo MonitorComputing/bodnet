@@ -39,9 +39,9 @@
 ;**********************************************************************
 
 
-	list      p=16F84
+	list      p=16f84
 
-#include <p16F84.inc>
+#include <p16f84.inc>
 
 #define SYNC_SERIAL
 
@@ -56,8 +56,8 @@
 ; Include and configuration directives                                *
 ;**********************************************************************
 
-#include <\dev\projects\utility\pic\asyn_srl.inc>
-#include <\dev\projects\utility\pic\link.inc>
+#include "../utility/asyn_srl.inc"
+#include "../utility/link_hd.inc"
 
 
 ;**********************************************************************
@@ -203,12 +203,6 @@ EndISR		bsf     clkPORT,clkBit    ; Set BodNet clock output low
 ; Physical layer service routine macro invocations                    *
 ;**********************************************************************
 
-SrvcULink	SrvcLink   PerformRxU, PerformTxU, lnkUSte, intSerIni, serUTmr, EnableTxU, InitTxU, EnableRxU, InitRxU
-
-
-SrvcDLink	SrvcLink   PerformRxD, PerformTxD, lnkDSte, intSerIni, serDTmr, EnableTxD, InitTxD, EnableRxD, InitRxD
-
-
 EnableRxU	EnableRx  rxUTRIS, rxUPORT, rxUBit
 		return
 
@@ -230,6 +224,9 @@ InitTxU		InitTx  serUTmr, serStatus, serURdy, txUBsy
 
 PerformTxU	PerformTx serUTmr, serStatus, serUByt, serUReg, serURdy, txUBsy, txDataBits, serUBitCnt, intSerBit, txUPORT, txUBit
 
+SrvcULink	SrvcLink   PerformRxU, PerformTxU, lnkUSte, intSerIni, serUTmr, EnableTxU, InitTxU, EnableRxU, InitRxU
+
+
 EnableRxD	EnableRx  rxDTRIS, rxDPORT, rxDBit
 		return
 
@@ -250,6 +247,9 @@ InitTxD		InitTx  serDTmr, serStatus, serDRdy, txDBsy
 
 
 PerformTxD	PerformTx serDTmr, serStatus, serDByt, serDReg, serDRdy, txDBsy, txDataBits, serDBitCnt, intSerBit, txDPORT, txDBit
+
+
+SrvcDLink	SrvcLink   PerformRxD, PerformTxD, lnkDSte, intSerIni, serDTmr, EnableTxD, InitTxD, EnableRxD, InitRxD
 
 
 ;**********************************************************************
