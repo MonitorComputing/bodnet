@@ -58,8 +58,8 @@
 ; Include and configuration directives                                *
 ;**********************************************************************
 
-#include <../utility/asyn_srl.inc>
-#include <../utility/link_hd.inc>
+#include <../utility_pic/asyn_srl.inc>
+#include <../utility_pic/link_hd.inc>
 
 
 ;**********************************************************************
@@ -148,7 +148,7 @@ lnkDSte       ; Link state register
 EEdirection	DE      00                ; Data direction mask, 0 - output    1 - input
 EEactiveLow	DE      00                ; Input active mask,   0 - high      1 - low
 EElatched	DE      00                ; Input latched mask,  0 - unlatched 1 - latched
- 
+
 
 ;**********************************************************************
 ; Reset vector                                                        *
@@ -250,7 +250,7 @@ LinkHTx		LinkTx lnkDSte, SerDTx
 
 #define NOMONBANNER
 #define MONUSERON
-#include <../utility/monitor.inc>
+#include <../utility_pic/monitor.inc>
 
 
 ;**********************************************************************
@@ -412,4 +412,3 @@ UserMain	; User main loop code
 
 
 		end                       ; directive 'end of program'
-

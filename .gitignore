@@ -8,3 +8,5 @@
 **/nbproject/private/
 **/nbproject/Makefile*
 **/nbproject/Package*
+/pic/bod2bod/dist/
+/pic/serl2bod/dist/

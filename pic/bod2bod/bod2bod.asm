@@ -56,8 +56,8 @@
 ; Include and configuration directives                                *
 ;**********************************************************************
 
-#include "../utility/asyn_srl.inc"
-#include "../utility/link_hd.inc"
+#include "../utility_pic/asyn_srl.inc"
+#include "../utility_pic/link_hd.inc"
 
 
 ;**********************************************************************
@@ -130,10 +130,12 @@ rxDataBits    EQU     9           ; 1 start (not counted), 8 data, no parity, 1 
 ; 'serStatus' bit definitions
 serURdy       EQU     0           ; Serial ready flag (0 - not ready, 1 - ready)
 rxUErr        EQU     1           ; Rx error, ignored received data
-txUBsy        EQU     1           ; Tx byte busy (0 - finished, 1 - in progress)
+txUClr        EQU     1           ; Tx byte clear
+RXUBREAK      EQU     2           ; 'Up' received 'break' status bit
 serDRdy       EQU     4           ; Serial ready flag (0 - not ready, 1 - ready)
 rxDErr        EQU     5           ; Rx error, ignored received data
-txDBsy        EQU     5           ; Tx byte busy (0 - finished, 1 - in progress)
+txDClr        EQU     5           ; Tx byte clear
+RXDBREAK      EQU     6           ; 'Down' received 'break' status bit
 
 MSB           EQU     7
 
@@ -207,49 +209,49 @@ EnableRxU	EnableRx  rxUTRIS, rxUPORT, rxUBit
 		return
 
 
-InitRxU		InitRx  serUTmr, serStatus, serURdy, rxUErr
+InitRxU		InitRx  serUTmr, serStatus, serURdy, rxUErr, RXUBREAK
 		return
 
 
-PerformRxU	PerformRx serUTmr, rxUPORT, rxUBit, serUBitCnt, rxDataBits, intSerBit, serStatus, rxUErr, serUReg, serUByt, serURdy, intSerBit
+SrvcRxU	ServiceRx serUTmr, rxUPORT, rxUBit, serUBitCnt, rxDataBits, intSerBit, serStatus, rxUErr, serUReg, serUByt, serURdy, intSerBit
 
 
 EnableTxU	EnableTx  txUTRIS, txUPORT, txUBit
 		return
 
 
-InitTxU		InitTx  serUTmr, serStatus, serURdy, txUBsy
+InitTxU		InitTx  serUTmr, serStatus, txUClr
 		return
 
 
-PerformTxU	PerformTx serUTmr, serStatus, serUByt, serUReg, serURdy, txUBsy, txDataBits, serUBitCnt, intSerBit, txUPORT, txUBit
+SrvcTxU	ServiceTx serUTmr, serStatus, serUByt, serUReg, serURdy, txUClr, txDataBits, serUBitCnt, intSerBit, txUPORT, txUBit
 
-SrvcULink	SrvcLink   PerformRxU, PerformTxU, lnkUSte, intSerIni, serUTmr, EnableTxU, InitTxU, EnableRxU, InitRxU
+SrvcULink	SrvcLink   SrvcRxU, SrvcTxU, lnkUSte, intSerIni, serUTmr, EnableTxU, InitTxU, EnableRxU, InitRxU
 
 
 EnableRxD	EnableRx  rxDTRIS, rxDPORT, rxDBit
 		return
 
 
-InitRxD		InitRx  serDTmr, serStatus, serDRdy, rxDErr
+InitRxD		InitRx  serDTmr, serStatus, serDRdy, rxDErr, RXDBREAK
 		return
 
 
-PerformRxD	PerformRx serDTmr, rxDPORT, rxDBit, serDBitCnt, rxDataBits, intSerBit, serStatus, rxDErr, serDReg, serDByt, serDRdy, intSerBit
+SrvcRxD	ServiceRx serDTmr, rxDPORT, rxDBit, serDBitCnt, rxDataBits, intSerBit, serStatus, rxDErr, serDReg, serDByt, serDRdy, intSerBit
 
 
 EnableTxD	EnableTx  txDTRIS, txDPORT, txDBit
 		return
 
 
-InitTxD		InitTx  serDTmr, serStatus, serDRdy, txDBsy
+InitTxD		InitTx  serDTmr, serStatus, txDClr
 		return
 
 
-PerformTxD	PerformTx serDTmr, serStatus, serDByt, serDReg, serDRdy, txDBsy, txDataBits, serDBitCnt, intSerBit, txDPORT, txDBit
+SrvcTxD	ServiceTx serDTmr, serStatus, serDByt, serDReg, serDRdy, txDClr, txDataBits, serDBitCnt, intSerBit, txDPORT, txDBit
 
 
-SrvcDLink	SrvcLink   PerformRxD, PerformTxD, lnkDSte, intSerIni, serDTmr, EnableTxD, InitTxD, EnableRxD, InitRxD
+SrvcDLink	SrvcLink   SrvcRxD, SrvcTxD, lnkDSte, intSerIni, serDTmr, EnableTxD, InitTxD, EnableRxD, InitRxD
 
 
 ;**********************************************************************
@@ -310,7 +312,7 @@ LinkUTx		; Test if a byte is queued in the 'Up' link Tx buffer for transmission
 
 		; Nothing queued, test if the 'Up' link has a transmission in progress
 
-		btfsc   serStatus,txUBsy  ; Skip if up interface Tx not in progress ...
+		btfss   serStatus,txUClr  ; Skip if up interface Tx not in progress ...
 		return                    ; ... otherwise return (wait for Tx to complete)
 
 		; The 'Up' link has completed all transmission, initiate a 'turnaround' to the receive state
@@ -465,4 +467,3 @@ NotMilliSec
 
 
 		end                       ; directive 'end of program'
-
