@@ -1,31 +1,14 @@
 ;**********************************************************************
 ;                                                                     *
-;    Description:                                                     *
+; Author: Chris White (whitecf69@gmail.com)                           *
 ;                                                                     *
-;    Author:        Chris White (whitecf@bcs.org.uk)                  *
-;    Company:       Monitor Computing Services Ltd.                   *
+; Copyright (C) 1999 by Monitor Computing Services Limited, licensed  *
+; under CC BY-NC-SA 4.0. To view a copy of this license, visit        *
+; https://creativecommons.org/licenses/by-nc-sa/4.0/                  *
 ;                                                                     *
-;**********************************************************************
-;                                                                     *
-;    Copyright (C) 1999  Monitor Computing Services Ltd.              *
-;                                                                     *
-;    This program is free software; you can redistribute it and/or    *
-;    modify it under the terms of the GNU General Public License      *
-;    as published by the Free Software Foundation; either version 2   *
-;    of the License, or any later version.                            *
-;                                                                     *
-;    This program is distributed in the hope that it will be useful,  *
-;    but WITHOUT ANY WARRANTY; without even the implied warranty of   *
-;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the    *
-;    GNU General Public License for more details.                     *
-;                                                                     *
-;    You should have received a copy of the GNU General Public        *
-;    License (http://www.gnu.org/copyleft/gpl.html) along with this   *
-;    program; if not, write to:                                       *
-;       The Free Software Foundation Inc.,                            *
-;       59 Temple Place - Suite 330,                                  *
-;       Boston, MA  02111-1307,                                       *
-;       USA.                                                          *
+; This program is distributed in the hope that it will be useful, but *
+; WITHOUT ANY WARRANTY; without even the implied warranty of          *
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                *
 ;                                                                     *
 ;**********************************************************************
 ;                                                                     *
@@ -115,48 +98,57 @@ rtccInt       EQU     255         ; Interrupt on RA4/RTCC input (10KHz clock sou
 #endif
 
 #ifndef SYNC_SERIAL
-intSerBit     EQU     2           ; Interrupts per serial bit @ 5K baud (simulated 4K8)
-intSerIni     EQU     3           ; Interrupts per initial Rx serial bit (start bit)
+INTSERBIT     EQU     2           ; Interrupts per serial bit @ 5K baud (simulated 4K8)
+INTSERINI     EQU     3           ; Interrupts per initial Rx serial bit (start bit)
 #else
-intSerBit     EQU     1           ; Interrupts per serial bit @ 10K baud
-intSerIni     EQU     1           ; Interrupts per initial Rx serial bit (start bit)
+INTSERBIT     EQU     1           ; Interrupts per serial bit @ 10K baud
+INTSERINI     EQU     1           ; Interrupts per initial Rx serial bit (start bit)
 #endif
+
+INTLINKDEL    EQU     0           ; Interrupt cycles for link turnaround delays
 
 intMilli      EQU     10          ; Interrupts per millisecond
 
 txDataBits    EQU     10          ; 1 start, 8 data, no parity, 1 stop (tx an extra zero)
 rxDataBits    EQU     9           ; 1 start (not counted), 8 data, no parity, 1 stop
 
-; 'serStatus' bit definitions
-serURdy       EQU     0           ; Serial ready flag (0 - not ready, 1 - ready)
-rxUErr        EQU     1           ; Rx error, ignored received data
-txUClr        EQU     1           ; Tx byte clear
-RXUBREAK      EQU     2           ; 'Up' received 'break' status bit
-serDRdy       EQU     4           ; Serial ready flag (0 - not ready, 1 - ready)
-rxDErr        EQU     5           ; Rx error, ignored received data
-txDClr        EQU     5           ; Tx byte clear
-RXDBREAK      EQU     6           ; 'Down' received 'break' status bit
+; 'Up' interface constants
+RXUFLAG   EQU     0           ; Receive byte buffer 'loaded' status bit
+RXUERR    EQU     1           ; Receive error status bit
+RXUBREAK  EQU     2           ; Received 'break' status bit
+RXUSTOP   EQU     3           ; Seeking stop bit status bit
+;  Half duplex so Rx and Tx flags share status bits
+TXUFLAG   EQU     RXUFLAG     ; Transmit byte buffer 'clear' status bit
+TXUBREAK  EQU     RXUBREAK    ; Send 'break' status bit
 
-MSB           EQU     7
+TXUTRIS       EQU     TRISA       ; 'Up' side Tx port direction register
+TXUPORT       EQU     PORTA       ; 'Up' side Tx port data register
+TXUBIT        EQU     3           ; Tx on Port A bit 3
+;  Half duplex so Rx and Tx share same IO
+RXUTRIS       EQU     TXUTRIS     ; 'Up' side Rx port direction register
+RXUPORT       EQU     TXUPORT     ; 'Up' side Rx port data register
+RXUBIT        EQU     TXUBIT      ; Rx on Port A bit 3
 
-; 'Up' side interface constants
-txUTRIS       EQU     TRISA       ; 'Up' side Tx port direction register
-txUPORT       EQU     PORTA       ; 'Up' side Tx port data register
-txUBit        EQU     3           ; Tx on Port A bit 3
-rxUTRIS       EQU     TRISA       ; 'Up' side Rx port direction register
-rxUPORT       EQU     PORTA       ; 'Up' side Rx port data register
-rxUBit        EQU     3           ; Rx on Port A bit 3
+; 'Down' interface constants
+RXDFLAG   EQU     4           ; Receive byte buffer 'loaded' status bit
+RXDERR    EQU     5           ; Receive error status bit
+RXDBREAK  EQU     6           ; Received 'break' status bit
+RXDSTOP   EQU     7           ; Seeking stop bit status bit
+;  Half duplex so Rx and Tx flags share status bits
+TXDFLAG   EQU     RXDFLAG     ; Transmit byte buffer 'clear' status bit
+TXDBREAK  EQU     RXDBREAK    ; Send 'break' status bit
 
-; 'Down' side interface constants
-txDTRIS       EQU     TRISA       ; 'Down' side Tx port direction register
-txDPORT       EQU     PORTA       ; 'Down' side Tx port data register
-txDBit        EQU     0           ; Tx on Port A bit 0
-rxDTRIS       EQU     TRISA       ; 'Down' side Rx port direction register
-rxDPORT       EQU     PORTA       ; 'Down' side Rx port data register
-rxDBit        EQU     0           ; Rx on Port A bit 0
-clkTRIS       EQU     TRISA       ; 'Down' side clock port direction register
-clkPORT       EQU     PORTA       ; 'Down' side clock port data register
-clkBit        EQU     1           ; 'Down' side clock output on Port A bit 1
+TXDTRIS       EQU     TRISA       ; 'Up' side Tx port direction register
+TXDPORT       EQU     PORTA       ; 'Up' side Tx port data register
+TXDBIT        EQU     0           ; Tx on Port A bit 0
+;  Half duplex so Rx and Tx share same IO
+RXDTRIS       EQU     TXDTRIS     ; 'Up' side Rx port direction register
+RXDPORT       EQU     TXDPORT     ; 'Up' side Rx port data register
+RXDBIT        EQU     TXDBIT      ; Rx on Port A bit 0
+
+CLKTRIS       EQU     TRISA       ; 'Down' side clock port direction register
+CLKPORT       EQU     PORTA       ; 'Down' side clock port data register
+CLKBIT        EQU     1           ; 'Down' side clock output on Port A bit 1
 
 
 ;**********************************************************************
@@ -181,7 +173,7 @@ BeginISR	movwf   w_isr             ; save off current W register contents
 
 		BANKSEL TMR0              ; Ensure register page 0 is selected
 
-		bcf     clkPORT,clkBit    ; Set BodNet clock output low
+		bcf     CLKPORT,CLKBIT    ; Set BodNet clock output low
 		bcf     INTCON,T0IF       ; Clear the RTCC interrupt bitflag
 
 		movlw   rtccInt
@@ -192,7 +184,7 @@ BeginISR	movwf   w_isr             ; save off current W register contents
 		call    SrvcULink         ; Perform up interface link service
 ;		call    SrvcDLink         ; Perform down interface link service
 
-EndISR		bsf     clkPORT,clkBit    ; Set BodNet clock output low
+EndISR		bsf     CLKPORT,CLKBIT    ; Set BodNet clock output low
 
 		movf    status_isr,W      ; Retrieve copy of STATUS register
 		movwf	STATUS            ; Restore pre-isr STATUS register contents
@@ -205,53 +197,55 @@ EndISR		bsf     clkPORT,clkBit    ; Set BodNet clock output low
 ; Physical layer service routine macro invocations                    *
 ;**********************************************************************
 
-EnableRxU	EnableRx  rxUTRIS, rxUPORT, rxUBit
-		return
+EnableRxU EnableRx  RXUTRIS, RXUPORT, RXUBIT
+    return
 
+InitRxU   InitRx  serStatus, serUTmr, serUBitCnt, serUReg, RXUFLAG, RXUERR, RXUBREAK, RXUSTOP
+    return
 
-InitRxU		InitRx  serUTmr, serStatus, serURdy, rxUErr, RXUBREAK
-		return
+SrvcRxU   ServiceRx serStatus, serUTmr, serUBitCnt, serUReg, serUByt, RXUPORT, RXUBIT, INTSERINI, INTSERBIT, RXUERR, RXUBREAK, RXUSTOP, RXUFLAG
 
+EnableTxU EnableTx  TXUTRIS, TXUPORT, TXUBIT
+    return
 
-SrvcRxU	ServiceRx serUTmr, rxUPORT, rxUBit, serUBitCnt, rxDataBits, intSerBit, serStatus, rxUErr, serUReg, serUByt, serURdy, intSerBit
+InitTxU   InitTx  serStatus, serUTmr, serUBitCnt, serUReg, TXUFLAG, TXUBREAK
+    return
 
+TxUBreak  TxBreak  serStatus, TXUBREAK
+    return
 
-EnableTxU	EnableTx  txUTRIS, txUPORT, txUBit
-		return
+SrvcTxU   ServiceTx serStatus, serUTmr, serUBitCnt, serUReg, serUByt, TXUPORT, TXUBIT, RXUPORT, RXUBIT, INTSERBIT, TXUFLAG, TXUBREAK
 
+SerURx    SerialRx serStatus, serUByt, RXUFLAG
 
-InitTxU		InitTx  serUTmr, serStatus, txUClr
-		return
+SerUTx    SerialTx serStatus, serUByt, TXUFLAG
 
+SrvcULink SrvcLink   lnkUSte, serUTmr, INTLINKDEL, INTLINKDEL, EnableTxU, InitTxU, SrvcTxU, TxUBreak, EnableRxU, InitRxU, SrvcRxU
 
-SrvcTxU	ServiceTx serUTmr, serStatus, serUByt, serUReg, serURdy, txUClr, txDataBits, serUBitCnt, intSerBit, txUPORT, txUBit
+EnableRxD EnableRx  RXDTRIS, RXDPORT, RXDBIT
+    return
 
-SrvcULink	SrvcLink   SrvcRxU, SrvcTxU, lnkUSte, intSerIni, serUTmr, EnableTxU, InitTxU, EnableRxU, InitRxU
+InitRxD   InitRx  serStatus, serDTmr, serDBitCnt, serDReg, RXDFLAG, RXDERR, RXDBREAK, RXDSTOP
+    return
 
+SrvcRxD   ServiceRx serStatus, serDTmr, serDBitCnt, serDReg, serDByt, RXDPORT, RXDBIT, INTSERINI, INTSERBIT, RXDERR, RXDBREAK, RXDSTOP, RXDFLAG
 
-EnableRxD	EnableRx  rxDTRIS, rxDPORT, rxDBit
-		return
+EnableTxD EnableTx  TXDTRIS, TXDPORT, TXDBIT
+    return
 
+InitTxD   InitTx  serStatus, serDTmr, serDBitCnt, serDReg, TXDFLAG, TXDBREAK
+    return
 
-InitRxD		InitRx  serDTmr, serStatus, serDRdy, rxDErr, RXDBREAK
-		return
+TxDBreak  TxBreak  serStatus, TXDBREAK
+    return
 
+SrvcTxD   ServiceTx serStatus, serDTmr, serDBitCnt, serDReg, serDByt, TXDPORT, TXDBIT, RXDPORT, RXDBIT, INTSERBIT, TXDFLAG, TXDBREAK
 
-SrvcRxD	ServiceRx serDTmr, rxDPORT, rxDBit, serDBitCnt, rxDataBits, intSerBit, serStatus, rxDErr, serDReg, serDByt, serDRdy, intSerBit
+SerDRx    SerialRx serStatus, serDByt, RXDFLAG
 
+SerDTx    SerialTx serStatus, serDByt, TXDFLAG
 
-EnableTxD	EnableTx  txDTRIS, txDPORT, txDBit
-		return
-
-
-InitTxD		InitTx  serDTmr, serStatus, txDClr
-		return
-
-
-SrvcTxD	ServiceTx serDTmr, serStatus, serDByt, serDReg, serDRdy, txDClr, txDataBits, serDBitCnt, intSerBit, txDPORT, txDBit
-
-
-SrvcDLink	SrvcLink   SrvcRxD, SrvcTxD, lnkDSte, intSerIni, serDTmr, EnableTxD, InitTxD, EnableRxD, InitRxD
+SrvcDLink SrvcLink   lnkDSte, serDTmr, INTLINKDEL, INTLINKDEL, EnableTxD, InitTxD, SrvcTxD, TxDBreak, EnableRxD, InitRxD, SrvcRxD
 
 
 ;**********************************************************************
@@ -260,13 +254,13 @@ SrvcDLink	SrvcLink   SrvcRxD, SrvcTxD, lnkDSte, intSerIni, serDTmr, EnableTxD, I
 
 LinkURx		; Test if a valid byte has been received by the 'Up' link
 
-		btfss   serStatus,serURdy ; Skip if up interface Rx byte 'loaded' flag set ...
+		btfss   serStatus,RXUFLAG ; Skip if up interface Rx byte 'loaded' flag set ...
 		return                    ; ... otherwise return (no new Rx data available)
 
-		btfss   serStatus,rxUErr  ; Skip if up interface Rx error flag set ...
+		btfss   serStatus,RXUERR  ; Skip if up interface Rx error flag set ...
 		goto    LinkURxData       ; ... otherwise jump (accept new Rx data)
 
-		bcf     serStatus,serURdy ; Clear up interface Rx byte 'loaded' flag (reject new Rx data)
+		bcf     serStatus,RXUFLAG ; Clear up interface Rx byte 'loaded' flag (reject new Rx data)
 		return
 
 LinkURxData	; A valid byte has been received, test if the 'Down' link is in the receive state
@@ -291,15 +285,15 @@ LinkDNotRx	; 'Down' link is not in the recieve state, test if it is in the trans
 
 		; 'Down' link is in the transmit state, test if it's Tx byte buffer is available
 
-		btfss   serStatus,serDRdy ; Skip if down interface Tx byte 'clear' flag set ...
+		btfss   serStatus,TXDFLAG ; Skip if down interface Tx byte 'clear' flag set ...
 		return                    ; ... otherwise return (down Tx data already queued)
 
 		; 'Down' link is in the transmit state and it's Tx byte buffer is available, relay the received byte
 
 		movf    serUByt,W         ; Copy up link Rx byte ...
 		movwf   serDByt           ; ... to down link Tx byte
-		bcf     serStatus,serURdy ; Clear up interface Rx byte 'loaded' flag
-		bcf     serStatus,serDRdy ; Clear down interface Tx byte 'clear' flag
+		bcf     serStatus,RXUFLAG ; Clear up interface Rx byte 'loaded' flag
+		bcf     serStatus,TXDFLAG ; Clear down interface Tx byte 'clear' flag
 		return
 
 
@@ -307,12 +301,12 @@ LinkDNotRx	; 'Down' link is not in the recieve state, test if it is in the trans
 
 LinkUTx		; Test if a byte is queued in the 'Up' link Tx buffer for transmission
 
-		btfss   serStatus,serURdy ; Skip if up interface Tx byte 'clear' flag set ...
+		btfss   serStatus,TXUFLAG ; Skip if up interface Tx byte 'clear' flag set ...
 		return                    ; ... otherwise return (Tx data queued)
 
 		; Nothing queued, test if the 'Up' link has a transmission in progress
 
-		btfss   serStatus,txUClr  ; Skip if up interface Tx not in progress ...
+		btfss   serStatus,TXUFLAG  ; Skip if up interface Tx not in progress ...
 		return                    ; ... otherwise return (wait for Tx to complete)
 
 		; The 'Up' link has completed all transmission, initiate a 'turnaround' to the receive state
@@ -325,7 +319,7 @@ LinkUTx		; Test if a byte is queued in the 'Up' link Tx buffer for transmission
 
 ; As this is a test program the 'Down' link simply simulates echoing of it's transmit data
 
-LinkD		btfsc   serStatus,serDRdy ; Skip if down interface Tx byte 'clear' flag not set ...
+LinkD		btfsc   serStatus,TXDFLAG ; Skip if down interface Tx byte 'clear' flag not set ...
 		return                    ; ... otherwise return (no new Tx data available)
 
 		movf    lnkUSte,W
@@ -342,13 +336,13 @@ LinkUNotInRx	movf    lnkUSte,W
 		btfss	STATUS,Z          ; Skip if up link in state 6 (transmitting) ...
 		return                    ; ... otherwise return
 
-		btfss   serStatus,serURdy ; Skip if up interface Tx byte 'clear' flag set ...
+		btfss   serStatus,TXUFLAG ; Skip if up interface Tx byte 'clear' flag set ...
 		return                    ; ... otherwise return (up Tx data already queued)
 
 		movf    serDByt,W         ; Copy down link Rx byte ...
 		movwf   serUByt           ; ... to up link Tx byte
-		bsf     serStatus,serDRdy ; Set down interface Tx byte 'clear' flag
-		bcf     serStatus,serURdy ; Clear up interface Tx byte 'clear' flag
+		bsf     serStatus,TXDFLAG ; Set down interface Tx byte 'clear' flag
+		bcf     serStatus,TXUFLAG ; Clear up interface Tx byte 'clear' flag
 		return
 
 
@@ -381,8 +375,12 @@ Main		clrf    PORTA             ; Clear I/O ports
 		; Initialise variables
 
 		; Initialise serial links
-		SerInit    serStatus, serUTmr, serUReg, serUByt, serUBitCnt, serUTmr, serUReg, serUByt, serUBitCnt
-		SerInit    serStatus, serDTmr, serDReg, serDByt, serDBitCnt, serDTmr, serDReg, serDByt, serDBitCnt
+		call    EnableRxU
+		call    InitRxU
+		clrf    lnkUSte           ; Initialise 'up' link to enter receiving state
+		call    EnableRxD
+		call    InitRxD
+		clrf    lnkDSte           ; Initialise 'down' link to enter receiving state
 
 		clrf    tmrCount          ; Initialise timing
 		clrf    nextMilli
@@ -395,7 +393,7 @@ Main		clrf    PORTA             ; Clear I/O ports
 		call    InitRxU
 		movlw   2                 ; Initial up link state ...
 		movwf   lnkUSte           ; ... to state 2 (receiving)
-		bsf     serStatus,serDRdy ; Set down interface Tx byte 'clear' flag
+		bsf     serStatus,TXDFLAG ; Set down interface Tx byte 'clear' flag
 		movlw   6                 ; Initial down link state ...
 		movwf   lnkDSte           ; ... to state 6 (transmitting)
 

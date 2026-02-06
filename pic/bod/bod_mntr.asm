@@ -1,31 +1,14 @@
 ;**********************************************************************
 ;                                                                     *
-;    Description:                                                     *
+; Author: Chris White (whitecf69@gmail.com)                           *
 ;                                                                     *
-;    Author:        Chris White (whitecf@bcs.org.uk)                  *
-;    Company:       Monitor Computing Services Ltd.                   *
+; Copyright (C) 2001 by Monitor Computing Services Limited, licensed  *
+; under CC BY-NC-SA 4.0. To view a copy of this license, visit        *
+; https://creativecommons.org/licenses/by-nc-sa/4.0/                  *
 ;                                                                     *
-;**********************************************************************
-;                                                                     *
-;    Copyright (C) 2001  Monitor Computing Services Ltd.              *
-;                                                                     *
-;    This program is free software; you can redistribute it and/or    *
-;    modify it under the terms of the GNU General Public License      *
-;    as published by the Free Software Foundation; either version 2   *
-;    of the License, or any later version.                            *
-;                                                                     *
-;    This program is distributed in the hope that it will be useful,  *
-;    but WITHOUT ANY WARRANTY; without even the implied warranty of   *
-;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the    *
-;    GNU General Public License for more details.                     *
-;                                                                     *
-;    You should have received a copy of the GNU General Public        *
-;    License (http://www.gnu.org/copyleft/gpl.html) along with this   *
-;    program; if not, write to:                                       *
-;       The Free Software Foundation Inc.,                            *
-;       59 Temple Place - Suite 330,                                  *
-;       Boston, MA  02111-1307,                                       *
-;       USA.                                                          *
+; This program is distributed in the hope that it will be useful, but *
+; WITHOUT ANY WARRANTY; without even the implied warranty of          *
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                *
 ;                                                                     *
 ;**********************************************************************
 ;                                                                     *
@@ -81,28 +64,38 @@ CLKPORT       EQU     PORTA       ; Clock tick output port
 CLKBIT        EQU     4           ; Clock tick output on Port A bit 4
 
 ; 'Up' interface constants
-RXUFLAG       EQU     0           ; 'Up' receive byte buffer 'loaded' status bit
-RXUERR        EQU     1           ; 'Up' receive error status bit
-RXUBREAK      EQU     2           ; 'Up' received 'break' status bit
-TXUFLAG       EQU     0           ; 'Up' transmit byte buffer 'clear' status bit
+RXUFLAG   EQU     0           ; Receive byte buffer 'loaded' status bit
+RXUERR    EQU     1           ; Receive error status bit
+RXUBREAK  EQU     2           ; Received 'break' status bit
+RXUSTOP   EQU     3           ; Seeking stop bit status bit
+;  Half duplex so Rx and Tx flags share status bits
+TXUFLAG   EQU     RXUFLAG     ; Transmit byte buffer 'clear' status bit
+TXUBREAK  EQU     RXUBREAK    ; Send 'break' status bit
+
 TXUTRIS       EQU     TRISA       ; 'Up' side Tx port direction register
 TXUPORT       EQU     PORTA       ; 'Up' side Tx port data register
 TXUBIT        EQU     1           ; Tx on Port A bit 1
-RXUTRIS       EQU     TRISA       ; 'Up' side Rx port direction register
-RXUPORT       EQU     PORTA       ; 'Up' side Rx port data register
-RXUBIT        EQU     1           ; Rx on Port A bit 1
+;  Half duplex so Rx and Tx share same IO
+RXUTRIS       EQU     TXUTRIS     ; 'Up' side Rx port direction register
+RXUPORT       EQU     TXUPORT     ; 'Up' side Rx port data register
+RXUBIT        EQU     TXUBIT      ; Rx on Port A bit 1
 
 ; 'Down' interface constants
-RXDFLAG       EQU     4           ; 'Down' receive byte buffer 'loaded' status bit
-RXDERR        EQU     5           ; 'Down' receive error status bit
-RXDBREAK      EQU     6           ; 'Down' received 'break' status bit
-TXDFLAG       EQU     4           ; 'Down' transmit byte buffer 'clear' status bit
-TXDTRIS       EQU     TRISA       ; 'Down' side Tx port direction register
-TXDPORT       EQU     PORTA       ; 'Down' side Tx port data register
-TXDBIT        EQU     0           ; 'Down' Tx on Port A bit 0
-RXDTRIS       EQU     TRISA       ; 'Down' side Rx port direction register
-RXDPORT       EQU     PORTA       ; 'Down' side Rx port data register
-RXDBIT        EQU     0           ; 'Down' Rx on Port A bit 0
+RXDFLAG   EQU     4           ; Receive byte buffer 'loaded' status bit
+RXDERR    EQU     5           ; Receive error status bit
+RXDBREAK  EQU     6           ; Received 'break' status bit
+RXDSTOP   EQU     7           ; Seeking stop bit status bit
+;  Half duplex so Rx and Tx flags share status bits
+TXDFLAG   EQU     RXDFLAG     ; Transmit byte buffer 'clear' status bit
+TXDBREAK  EQU     RXDBREAK    ; Send 'break' status bit
+
+TXDTRIS       EQU     TRISA       ; 'Up' side Tx port direction register
+TXDPORT       EQU     PORTA       ; 'Up' side Tx port data register
+TXDBIT        EQU     0           ; Tx on Port A bit 1
+;  Half duplex so Rx and Tx share same IO
+RXDTRIS       EQU     TXDTRIS     ; 'Up' side Rx port direction register
+RXDPORT       EQU     TXDPORT     ; 'Up' side Rx port data register
+RXDBIT        EQU     TXDBIT      ; Rx on Port A bit 1
 
 
 ;**********************************************************************
@@ -170,84 +163,70 @@ BootVector	goto    Main              ; Jump to beginning of program
 ; Link and interface routine macro invocations                        *
 ;**********************************************************************
 
-EnableRxU	EnableRx  RXUTRIS, RXUPORT, RXUBIT
-		return
+EnableRxU EnableRx  RXUTRIS, RXUPORT, RXUBIT
+    return
 
+InitRxU   InitRx  serStatus, serUTmr, serUBitCnt, serUReg, RXUFLAG, RXUERR, RXUBREAK, RXUSTOP
+    return
 
-InitRxU		InitRx  serUTmr, serStatus, RXUFLAG, RXUERR, RXUBREAK
-		return
+SrvcRxU   ServiceRx serStatus, serUTmr, serUBitCnt, serUReg, serUByt, RXUPORT, RXUBIT, INTSERINI, INTSERBIT, RXUERR, RXUBREAK, RXUSTOP, RXUFLAG
 
+EnableTxU EnableTx  TXUTRIS, TXUPORT, TXUBIT
+    return
 
-SrvcRxU		ServiceRx serUTmr, RXUPORT, RXUBIT, serUBitCnt, INTSERINI, serStatus, RXUERR, RXUBREAK, serUReg, serUByt, RXUFLAG, INTSERBIT
+InitTxU   InitTx  serStatus, serUTmr, serUBitCnt, serUReg, TXUFLAG, TXUBREAK
+    return
 
+TxUBreak  TxBreak  serStatus, TXUBREAK
+    return
 
-EnableTxU	EnableTx  TXUTRIS, TXUPORT, TXUBIT
-		return
+SrvcTxU   ServiceTx serStatus, serUTmr, serUBitCnt, serUReg, serUByt, TXUPORT, TXUBIT, RXUPORT, RXUBIT, INTSERBIT, TXUFLAG, TXUBREAK
 
+SerURx    SerialRx serStatus, serUByt, RXUFLAG
 
-InitTxU		InitTx  serUTmr, serStatus, TXUFLAG
-		return
+SerUTx    SerialTx serStatus, serUByt, TXUFLAG
 
+SrvcULink SrvcLink   lnkUSte, serUTmr, INTLINKDEL, INTLINKDEL, EnableTxU, InitTxU, SrvcTxU, TxUBreak, EnableRxU, InitRxU, SrvcRxU
 
-SrvcTxU		ServiceTx serUTmr, serStatus, serUByt, serUReg, TXUFLAG, serUBitCnt, INTSERBIT, TXUPORT, TXUBIT, 0, 0
+LinkMRx   LinkRx lnkUSte, SerDRx
 
+LinkMTx   LinkTx lnkUSte, SerDTx
 
-SerURx		SerialRx serStatus, RXUFLAG, serUByt
+EnableRxD EnableRx  RXDTRIS, RXDPORT, RXDBIT
+    return
 
+InitRxD   InitRx  serStatus, serDTmr, serDBitCnt, serDReg, RXDFLAG, RXDERR, RXDBREAK, RXDSTOP
+    return
 
-SerUTx		SerialTx serStatus, TXUFLAG, serUByt
+SrvcRxD   ServiceRx serStatus, serDTmr, serDBitCnt, serDReg, serDByt, RXDPORT, RXDBIT, INTSERINI, INTSERBIT, RXDERR, RXDBREAK, RXDSTOP, RXDFLAG
 
+EnableTxD EnableTx  TXDTRIS, TXDPORT, TXDBIT
+    return
 
-SrvcULink	SrvcLink   SrvcRxU, SrvcTxU, lnkUSte, INTLINKDEL, serUTmr, EnableTxU, InitTxU, EnableRxU, InitRxU
+InitTxD   InitTx  serStatus, serDTmr, serDBitCnt, serDReg, TXDFLAG, TXDBREAK
+    return
 
+TxDBreak  TxBreak  serStatus, TXDBREAK
+    return
 
-LinkMRx		LinkRx lnkUSte, SerURx
+SrvcTxD   ServiceTx serStatus, serDTmr, serDBitCnt, serDReg, serDByt, TXDPORT, TXDBIT, RXDPORT, RXDBIT, INTSERBIT, TXDFLAG, TXDBREAK
 
+SerDRx    SerialRx serStatus, serDByt, RXDFLAG
 
-LinkMTx		LinkTx lnkUSte, SerUTx
+SerDTx    SerialTx serStatus, serDByt, TXDFLAG
 
+SrvcDLink SrvcLink   lnkDSte, serDTmr, INTLINKDEL, INTLINKDEL, EnableTxD, InitTxD, SrvcTxD, TxDBreak, EnableRxD, InitRxD, SrvcRxD
 
-EnableRxD	EnableRx  RXDTRIS, RXDPORT, RXDBIT
-		return
+LinkHRx   LinkRx lnkDSte, SerDRx
 
-
-InitRxD		InitRx  serDTmr, serStatus, RXDFLAG, RXDERR, RXDBREAK
-		return
-
-
-SrvcRxD		ServiceRx serDTmr, RXDPORT, RXDBIT, serDBitCnt, INTSERINI, serStatus, RXDERR, RXDBREAK, serDReg, serDByt, RXDFLAG, INTSERBIT
-
-
-EnableTxD	EnableTx  TXDTRIS, TXDPORT, TXDBIT
-		return
-
-
-InitTxD		InitTx  serDTmr, serStatus, TXDFLAG
-		return
-
-
-SrvcTxD		ServiceTx serDTmr, serStatus, serDByt, serDReg, TXDFLAG, serDBitCnt, INTSERBIT, TXDPORT, TXDBIT, 0, 0
-
-
-SerDRx		SerialRx serStatus, RXDFLAG, serDByt
-
-
-SerDTx		SerialTx serStatus, TXDFLAG, serDByt
-
-
-SrvcDLink	SrvcLink   SrvcRxD, SrvcTxD, lnkDSte, INTLINKDEL, serDTmr, EnableTxD, InitTxD, EnableRxD, InitRxD
-
-
-LinkHRx		LinkRx lnkDSte, SerDRx
-
-
-LinkHTx		LinkTx lnkDSte, SerDTx
+LinkHTx   LinkTx lnkDSte, SerDTx
 
 
 ;**********************************************************************
 ; Monitor code                                                        *
 ;**********************************************************************
 
+#include "../utility_pic/eeprom.inc"
 #define NOMONBANNER
 #define MONUSERON
 #include <../utility_pic/monitor.inc>
@@ -323,7 +302,6 @@ Main		clrf    PORTA             ; Clear I/O ports
 		; Initialise variables
 
 		; Initialise serial link
-		SerInit    serStatus, serUTmr, serUReg, serUByt, serUBitCnt, serUTmr, serUReg, serUByt, serUBitCnt
 		call    EnableRxU
 		call    InitRxU
 		clrf    lnkUSte           ; Initialise 'up' link to enter receiving state
